@@ -6,14 +6,20 @@ const sharp = require('sharp');
     let srcFile = "input.jpg";
 
     const maxWidth = 1920;
+    const maxHeight = 1080;
     const pathPrefix = "test/";
 
-    // resize to maxWidth, convert to webp
+    // resize and convert to webp
     const metadata = await sharp(srcFile).metadata();
-    const width = (metadata.width > maxWidth) ? maxWidth : metadata.width;
+
+    let ratioX = maxWidth / metadata.width;
+    let ratioY = maxHeight / metadata.height;
+    let ratio = Math.min(ratioX, ratioY);
+    let newWidth = Math.round(metadata.width * ratio);
+    let newHeight = Math.round(metadata.height * ratio);
 
     const buffer = await sharp(srcFile)
-        .resize(width).webp().toBuffer();
+        .resize(newWidth, newHeight).webp().toBuffer();
 
     await sharp(buffer).toFile(destFile);
 
